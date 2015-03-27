@@ -28,6 +28,9 @@ local.a["start"][1]["age"] = 22
 local.a["start"][1]["cool"] = 0
 */
 
+var acorn = require('acorn');
+var traverse = require('traverse');
+
 function quoteIfString(val) {
     if (typeof val === 'string') {
         return '"' + val + '"';
@@ -36,49 +39,39 @@ function quoteIfString(val) {
     }
 }
 
-function traverse(json, valueFunc, stack) {
-    stack = stack || [];
+function getParentKeys(node, list) {
+    list = list || [];
 
-    for (var key in json) {
-        stack.push(key);
-
-        valueFunc(key, json[key], stack.slice());
-
-        if (json[key] !== null && typeof(json[key]) === 'object') {
-            //going on step down in the object tree!!
-            traverse(json[key], valueFunc, stack);
-        }
-
-        stack.pop(key);
+    if (node.parent) {
+        list.unshift(node.key);
+        return getParentKeys(node.parent, list);
+    } else {
+        return list;
     }
 }
 
 module.exports = {
     parse: function (script) {
 
-        var acorn = require('acorn');
         var ast = acorn.parse(script);
         var outStr = 'main:\n';
 
-        function processNode(key, value, stack) {
-            if (typeof value === 'object') return;
+        traverse(ast).forEach(function (d) {
+            var parentKeys;
 
-            var str = 'local.a';
+            if (this.isLeaf) {
+                parentKeys = getParentKeys(this);
 
-            for (var i = 0; i < stack.length; i++) {
-                str += '[' + quoteIfString(stack[i]) + ']';
+                // Turn the list of parent keys into a chain of array access notation
+                // beginning with local.a
+                outStr += parentKeys.reduce(function (acc, key) {
+                    return acc + '[' + quoteIfString(key) + ']';
+                }, 'local.a');
+
+                // Assign the leaf value
+                outStr += '=' + quoteIfString(d) + '\n';
             }
-
-            if (typeof value === 'boolean') {
-                value = value ? 1 : 0;
-            }
-
-            str += "=" + quoteIfString(value);
-
-            outStr += str + '\n';
-        }
-
-        traverse(ast, processNode);
+        });
 
         outStr += 'end local.a\n';
 
