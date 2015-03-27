@@ -27,6 +27,7 @@ local.a["start"][1]["name"] = "bob"
 local.a["start"][1]["age"] = 22
 local.a["start"][1]["cool"] = 0
 */
+'use strict';
 
 var acorn = require('acorn');
 var traverse = require('traverse');
