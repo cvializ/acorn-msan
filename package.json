@@ -1,7 +1,7 @@
 {
   "name": "acorn-msan",
   "version": "0.1.0",
-  "description": "",
+  "description": "Convert JavaScript files into a MorpheusScript-readable AST",
   "main": "index.js",
   "scripts": {
     "start": "node ./cli.js"

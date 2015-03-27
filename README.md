@@ -1,7 +1,10 @@
 acorn-msan
 ==========
 
-Converts JavaScript files into a script containing a data structure readable by Morpheus Script programs.
+> MSAN: Morpheus Script Associative Array Notation
+
+
+This tool uses acorn to convert a JavaScript AST into a Morpheus Script-compatible data structure. This will allow pre-parsing JavaScript files so that the Morpheus Script engine won't need to.
 
 Usage
 -----
@@ -32,5 +35,13 @@ local.a["body"]["0"]["declarations"]["0"]["id"]["end"]=8
 ### Command Line
 
 ```shell
+# Using files
 acorn-msan --infile sample.js --outfile out.scr
+
+# Or piping
+echo 'var x = { cool: "deal" }' | acorn-msan > out.scr
+
+
 ```
+
+Run `acorn-msan --help` for full usage info.

@@ -10,8 +10,9 @@ var MSAN = require('./');
 
 program
     .version(pkg.version)
-    .option('-i, --infile [filename]', 'The path of the input JavaScript file to convert.')
-    .option('[-o, --outfile [filename]', 'The path for the Morpheus Script output. Outputs to stdout if unspecified.')
+    .description(pkg.description)
+    .option('-i, --infile [filename]', 'The path of the input JavaScript file to convert. Reads from stdin if unspecified')
+    .option('-o, --outfile [filename]', 'The path for the Morpheus Script output. Writes to stdout if unspecified.')
     .parse(process.argv);
 
 var inputStream = (program.infile && program.infile !== '-' ? fs.createReadStream(program.infile) : process.stdin);
