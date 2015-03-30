@@ -15,8 +15,9 @@ Usage
 ```javascript
 
 var MSAN = require('acorn-msan');
+var acorn = require('acorn');
 var jsCode = 'var data = [{ "name": "carlos", "age": 22 }];'
-var msanCode = MSAN.parse(jsCode);
+var msanCode = MSAN.parse(acorn.parse(jsCode));
 
 console.log(msanCode);
 
