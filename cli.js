@@ -5,6 +5,7 @@
 var fs = require('fs');
 var program = require('commander');
 var concat = require('concat-stream');
+var acorn = require('acorn');
 var pkg = require('./package.json');
 var MSAN = require('./');
 
@@ -30,7 +31,8 @@ outputStream.on('error', function (err) {
 // Read the streamed input data to the MSAN parser
 // then write the result to the output stream
 var cs = concat(function (inputBuffer) {
-    var result = MSAN.parse(inputBuffer);
+    var ast = acorn.parse(inputBuffer);
+    var result = MSAN.parse(ast);
     outputStream.write(result);
 });
 

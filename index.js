@@ -29,7 +29,6 @@ local.a["start"][1]["cool"] = 0
 */
 'use strict';
 
-var acorn = require('acorn');
 var traverse = require('traverse');
 
 function quoteIfString(val) {
@@ -52,12 +51,10 @@ function getParentKeys(node, list) {
 }
 
 module.exports = {
-    parse: function (script) {
-
-        var ast = acorn.parse(script);
+    parse: function (obj) {
         var outStr = 'main:\n';
 
-        traverse(ast).forEach(function (d) {
+        traverse(obj).forEach(function (d) {
             var parentKeys;
 
             if (this.isLeaf) {
