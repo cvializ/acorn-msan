@@ -31,9 +31,13 @@ local.a["start"][1]["cool"] = 0
 
 var traverse = require('traverse');
 
+function escapeQuotes(val) {
+    return val.split('"').join('\\"');
+}
+
 function quoteIfString(val) {
     if (typeof val === 'string') {
-        return '"' + val + '"';
+        return '"' + escapeQuotes(val) + '"';
     } else {
         return val;
     }
