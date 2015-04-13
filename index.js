@@ -32,15 +32,11 @@ local.a["start"][1]["cool"] = 0
 var traverse = require('traverse');
 
 function escapeQuotes(val) {
-    return val.split('"').join('\\"');
+    return String(val).split('"').join('\\"');
 }
 
-function quoteIfString(val) {
-    if (typeof val === 'string') {
-        return '"' + escapeQuotes(val) + '"';
-    } else {
-        return val;
-    }
+function quote(val) {
+    return '"' + escapeQuotes(val) + '"';
 }
 
 function getParentKeys(node, list) {
@@ -67,11 +63,18 @@ module.exports = {
                 // Turn the list of parent keys into a chain of array access notation
                 // beginning with local.a
                 outStr += parentKeys.reduce(function (acc, key) {
-                    return acc + '[' + quoteIfString(key) + ']';
+                    return acc + '[' + quote(key) + ']';
                 }, 'local.a');
 
                 // Assign the leaf value
-                outStr += '=' + quoteIfString(d) + '\n';
+                if (typeof d === 'string') {
+                    d = quote(d);
+                } else if (typeof d === 'boolean') {
+                    // convert to number. true and false are 1 and 0 in MSAN
+                    d = +d;
+                }
+
+                outStr += '=' + d + '\n';
             }
         });
 
