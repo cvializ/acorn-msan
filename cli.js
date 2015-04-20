@@ -4,7 +4,7 @@
 
 var fs = require('fs');
 var program = require('commander');
-var concat = require('concat-stream');
+var es = require('event-stream');
 var acorn = require('acorn');
 var pkg = require('./package.json');
 var MSAN = require('./');
@@ -28,13 +28,24 @@ outputStream.on('error', function (err) {
     console.error('Do you have the correct permissions?');
 });
 
-// Read the streamed input data to the MSAN parser
-// then write the result to the output stream
-var cs = concat(function (inputBuffer) {
-    var ast = acorn.parse(inputBuffer);
-    var result = MSAN.parse(ast);
-    outputStream.write(result);
+var acornStream = es.map(function (data, cb) {
+  try {
+    var ast = acorn.parse(data.toString('utf8'));
+  } catch (e) {
+    cb(e);
+  }
+  cb(null, ast);
 });
 
-// Pass the input data to the concat stream
-inputStream.pipe(cs);
+// Expects data to be an Mozilla Parser API AST
+var msanStream = es.map(function (data, cb) {
+  cb(null, MSAN.parse(data));
+});
+
+// Wait for all the string data to be available,
+// then pass it down the pipeline
+inputStream
+  .pipe(es.wait())
+  .pipe(acornStream)
+  .pipe(msanStream)
+  .pipe(outputStream);
